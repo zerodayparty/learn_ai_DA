@@ -1,0 +1,264 @@
+# =========================================================
+# OS / Editor
+# =========================================================
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+.idea/
+*.swp
+*.swo
+
+# =========================================================
+# Environment / Secrets
+# 절대 GitHub에 올리면 안 되는 것들
+# =========================================================
+
+.env
+.env.*
+!.env.example
+!.env.sample
+
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.jks
+
+secrets/
+secret/
+credentials/
+private/
+keys/
+_practice
+_complete_summary
+
+service-account*.json
+google-credentials*.json
+firebase-adminsdk*.json
+
+# API key / token dumps
+AGENTS.md
+*.token
+*.secret
+*.credentials
+
+# =========================================================
+# Python
+# =========================================================
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+*.so
+
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+
+*.egg-info/
+.installed.cfg
+*.egg
+
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Python tools
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# =========================================================
+# Node / Frontend
+# =========================================================
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+.pnpm-store/
+.npm/
+.yarn/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+.next/
+.nuxt/
+.svelte-kit/
+astro/dist/
+out/
+
+dist/
+build/
+coverage/
+
+# =========================================================
+# AI / ML Data
+# 데이터셋은 Git에 직접 올리지 않는 것이 기본
+# =========================================================
+
+# data 안의 파일과 하위 폴더를 무시한다.
+data/*
+# 빈 폴더를 유지하기 위한 파일만 허용한다.
+!data/.gitkeep
+!data/dataset.md
+datasets/
+dataset/
+raw_data/
+processed_data/
+external_data/
+
+*.csv
+*.tsv
+*.parquet
+*.feather
+*.arrow
+*.jsonl
+*.ndjson
+*.sqlite
+*.sqlite3
+*.db
+*.duckdb
+
+# 단, 예시 데이터는 허용
+!*.sample.csv
+!*.example.csv
+
+# =========================================================
+# AI / ML Models
+# 모델 파일은 너무 크고 Git에 부적합
+# 필요하면 Git LFS 사용
+# =========================================================
+
+models/
+model/
+checkpoints/
+checkpoint/
+ckpts/
+weights/
+artifacts/
+
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.bin
+*.onnx
+*.h5
+*.hdf5
+*.pb
+*.tflite
+*.pkl
+*.pickle
+*.joblib
+
+# =========================================================
+# Hugging Face / Transformers / Datasets Cache
+# =========================================================
+
+.cache/
+.cache/huggingface/
+huggingface/
+hf_cache/
+transformers_cache/
+datasets_cache/
+
+# =========================================================
+# Experiment Tracking
+# =========================================================
+
+wandb/
+mlruns/
+runs/
+lightning_logs/
+tensorboard/
+tb_logs/
+logs/
+log/
+
+*.log
+
+# =========================================================
+# Outputs / Generated Files
+# =========================================================
+
+outputs/
+output/
+results/
+result/
+reports/generated/
+generated/
+tmp/
+temp/
+_temporary/
+
+
+*.tmp
+*.bak
+
+# =========================================================
+# Docker / Local Dev
+# =========================================================
+
+.docker/
+docker-data/
+volumes/
+
+# 단, Dockerfile / docker-compose.yml은 보통 Git에 올려야 함
+# Dockerfile
+# docker-compose.yml
+
+# =========================================================
+# Database / Local Storage
+# =========================================================
+
+*.db
+*.sqlite
+*.sqlite3
+*.duckdb
+
+local_storage/
+storage/
+uploads/
+
+!README.md
+!.env.example
+!.gitignore
+_record
