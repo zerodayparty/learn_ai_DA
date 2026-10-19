@@ -236,23 +236,53 @@ class DataAnalyzer:  # 데이터를 읽고 분석하는 기능을 하나의 도�
 
     # ✅ RFM 고객 특성 계산
     def calculate_rfm(self, customer_col='customer_id', date_col='order_date', amount_col='amount', reference_date=None, frequency='purchase_rows'):  # 전체 구매 이력으로 고객 특성을 계산한다.
+        
         if frequency not in {'purchase_rows', 'purchase_days'}:  # 주문 수로 잘못 부르지 않게 허용하는 단위를 정한다.
             raise ValueError('구매 빈도는 purchase_rows 또는 purchase_days로 지정해.')  # 없는 주문 번호를 만들지 않는다.
+        
+
+        # 🔥 마지막 주문일을 구해서
         reference = self.df[date_col].max() if reference_date is None else pd.Timestamp(reference_date)  # 명시한 분석일 또는 마지막 거래일을 기준일로 쓴다.
+        
         if reference < self.df[date_col].max():  # 마지막 거래보다 과거인 기준일을 막는다.
             raise ValueError('RFM 기준일은 마지막 거래일보다 이르면 안 된다.')  # 음수 최근 구매 간격을 만들지 않는다.
-        grouped = self.df.groupby(customer_col, sort=True)  # 고객별로 모든 기간 구매를 모은다.
+        
+
+
+        # 🔥 고객별로 모든 기간 구매를 모은다.
+        grouped = self.df.groupby(customer_col, sort=True)  
+        
         result = grouped.agg(last_purchase=(date_col, 'max'), purchase_rows=(date_col, 'size'), purchase_days=(date_col, 'nunique'), monetary=(amount_col, 'sum'))  # 구매 행·구매일·금액을 함께 계산한다.
+        
         result['recency'] = (reference - result['last_purchase']).dt.days  # 마지막 구매 후 지난 날짜를 계산한다.
+        
         result['frequency'] = result[frequency]  # 선택한 구매 빈도 단위를 사용한다.
+        
+
+        # 🟡 왜 1~4점으로 나누는가?
+            # 하위 25% 정도 → 1점
+            # 25~50% 정도  → 2점
+            # 50~75% 정도  → 3점
+            # 상위 25% 정도 → 4점
         result['r_score'] = np.ceil((1 - result['recency'].rank(method='average', pct=True)) * 4).clip(1, 4).astype(int)  # 같은 값의 고객은 같은 최근 구매 점수를 받는다.
+        
+    
+
+        
         result['f_score'] = np.ceil(result['frequency'].rank(method='average', pct=True) * 4).clip(1, 4).astype(int)  # 구매 빈도 순위를 네 단계 점수로 바꾼다.
+        
         result['m_score'] = np.ceil(result['monetary'].rank(method='average', pct=True) * 4).clip(1, 4).astype(int)  # 금액 순위를 네 단계 점수로 바꾼다.
+        
         recency_cut = float(result['recency'].median())  # 표본 고객 중앙값을 최근 구매 기준으로 정한다.
+        
         frequency_cut = float(result['frequency'].median())  # 표본의 구매 빈도 중앙값을 계산한다.
+        
         monetary_cut = float(result['monetary'].median())  # 표본의 금액 중앙값을 계산한다.
+        
         recent = result['recency'].le(recency_cut)  # 이 데이터 기간 안에서 상대적으로 최근에 온 고객을 찾는다.
+        
         valuable = result['frequency'].ge(frequency_cut) & result['monetary'].ge(monetary_cut)  # 빈도와 금액이 모두 중앙값 이상인 고객을 구분한다.
+        
         result['segment'] = np.select([recent & valuable, recent & ~valuable, ~recent & valuable], SEGMENTS[:3], default=SEGMENTS[3])  # 의미가 겹치지 않는 네 그룹으로 나눈다.
         self.rfm = result.reset_index()  # 고객 번호를 로컬 결과에만 보관한다.
         self.audit['rfm'] = {'reference_date': reference.date().isoformat(), 'frequency_unit': frequency, 'amount_unit': 'source price units; currency unverified', 'recency_median_days': recency_cut, 'frequency_median': frequency_cut, 'monetary_median': monetary_cut, 'segment_count': int(result['segment'].nunique()), 'score_ties': 'average percentile rank; equal values share scores'}  # 점수와 그룹 기준을 공개 가능한 형태로 기록한다.
