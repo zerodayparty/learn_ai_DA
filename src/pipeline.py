@@ -21,7 +21,7 @@ from matplotlib.image import imread  # 과제에서 허용한 이미지 입력 �
 
 # -----------------------------------------------------
 # 차트와 보고서에서 같은 고객 그룹 순서를 사용한다.
-SEGMENTS = ['Recent high value', 'Recent other', 'Less recent high value', 'Less recent other']  
+SEGMENTS = ['Recent buyers / Frequent & high spending', 'Recent buyers / Less frequent or lower spending', 'No recent purchase / Frequent & high spending', 'No recent purchase / Less frequent or lower spending']
 
 
 # -----------------------------------------------------
@@ -258,7 +258,7 @@ class DataAnalyzer:  # 데이터를 읽고 분석하는 기능을 하나의 도�
         
         result['frequency'] = result[frequency]  # 선택한 구매 빈도 단위를 사용한다.
         
-
+        # 🟢 고객을 작은 값부터 줄 세우고 → 전체에서 몇 % 위치인지 계산하고 → 그 위치를 1~4점으로 바꾸는 코드
         # 🟡 왜 1~4점으로 나누는가?
             # 하위 25% 정도 → 1점
             # 25~50% 정도  → 2점
@@ -266,27 +266,30 @@ class DataAnalyzer:  # 데이터를 읽고 분석하는 기능을 하나의 도�
             # 상위 25% 정도 → 4점
         result['r_score'] = np.ceil((1 - result['recency'].rank(method='average', pct=True)) * 4).clip(1, 4).astype(int)  # 같은 값의 고객은 같은 최근 구매 점수를 받는다.
         
-    
-
-        
         result['f_score'] = np.ceil(result['frequency'].rank(method='average', pct=True) * 4).clip(1, 4).astype(int)  # 구매 빈도 순위를 네 단계 점수로 바꾼다.
         
         result['m_score'] = np.ceil(result['monetary'].rank(method='average', pct=True) * 4).clip(1, 4).astype(int)  # 금액 순위를 네 단계 점수로 바꾼다.
         
+
+
         recency_cut = float(result['recency'].median())  # 표본 고객 중앙값을 최근 구매 기준으로 정한다.
-        
         frequency_cut = float(result['frequency'].median())  # 표본의 구매 빈도 중앙값을 계산한다.
-        
         monetary_cut = float(result['monetary'].median())  # 표본의 금액 중앙값을 계산한다.
         
+
         recent = result['recency'].le(recency_cut)  # 이 데이터 기간 안에서 상대적으로 최근에 온 고객을 찾는다.
         
         valuable = result['frequency'].ge(frequency_cut) & result['monetary'].ge(monetary_cut)  # 빈도와 금액이 모두 중앙값 이상인 고객을 구분한다.
         
         result['segment'] = np.select([recent & valuable, recent & ~valuable, ~recent & valuable], SEGMENTS[:3], default=SEGMENTS[3])  # 의미가 겹치지 않는 네 그룹으로 나눈다.
+        
+
         self.rfm = result.reset_index()  # 고객 번호를 로컬 결과에만 보관한다.
         self.audit['rfm'] = {'reference_date': reference.date().isoformat(), 'frequency_unit': frequency, 'amount_unit': 'source price units; currency unverified', 'recency_median_days': recency_cut, 'frequency_median': frequency_cut, 'monetary_median': monetary_cut, 'segment_count': int(result['segment'].nunique()), 'score_ties': 'average percentile rank; equal values share scores'}  # 점수와 그룹 기준을 공개 가능한 형태로 기록한다.
         return self.rfm  # 고객별 결과를 반환하되 화면에는 집계만 표시한다.
+
+
+
 
 
     # ✅ [save_processed] 고객 그룹별 요약

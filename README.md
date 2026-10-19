@@ -87,14 +87,16 @@ uv run --locked --python 3.11 jupyter lab notebooks/analysis_report.ipynb
 
 ## 🟢 RFM 고객 그룹  
 
+그룹 이름은 `/` 앞에서 최근 구매 여부, 뒤에서 구매 빈도·금액을 읽는다. `Recent buyers`는 최근 기준 안에 구매한 고객, `No recent purchase`는 그 기간 안에 구매가 없는 고객이다. `Frequent & high spending`은 빈도와 금액 기준을 모두 만족하고, `Less frequent or lower spending`은 둘 중 하나 이상이 기준보다 낮다는 뜻이다. 신규·실제 이탈 여부를 확정한 이름은 아니다.
+
 최근 기준은 미구매 간격 151.0일 이하, 고가치는 구매 빈도 10.0행 이상과 금액 0.253186 이상을 모두 만족하는 것이다. 모두 표본 중앙값 기준이다. R·F·M 점수는 1~4의 평균 백분위 순위로 계산하고 같은 값에 같은 점수를 준다. 그룹은 아래 조건으로 별도 정의한다.  
 
 | segment | customers | mean_recency | mean_frequency | mean_monetary | total_monetary | customer_share | monetary_share |  
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Recent high value | 183 | 46.7705 | 51.4863 | 1.4330 | 262.2428 | 0.3660 | 0.8018 |  
-| Recent other | 68 | 65.8824 | 4.7500 | 0.1205 | 8.1942 | 0.1360 | 0.0251 |  
-| Less recent high value | 57 | 342.4035 | 24.3333 | 0.6390 | 36.4233 | 0.1140 | 0.1114 |  
-| Less recent other | 192 | 454.3385 | 4.1406 | 0.1052 | 20.2041 | 0.3840 | 0.0618 |  
+| Recent buyers / Frequent & high spending | 183 | 46.7705 | 51.4863 | 1.4330 | 262.2428 | 0.3660 | 0.8018 |
+| Recent buyers / Less frequent or lower spending | 68 | 65.8824 | 4.7500 | 0.1205 | 8.1942 | 0.1360 | 0.0251 |
+| No recent purchase / Frequent & high spending | 57 | 342.4035 | 24.3333 | 0.6390 | 36.4233 | 0.1140 | 0.1114 |
+| No recent purchase / Less frequent or lower spending | 192 | 454.3385 | 4.1406 | 0.1052 | 20.2041 | 0.3840 | 0.0618 |
 
 ![고객 그룹 비교](reports/figures/03_segment_bar.png)  
 
@@ -104,19 +106,19 @@ uv run --locked --python 3.11 jupyter lab notebooks/analysis_report.ipynb
 
 ### 🟡 최근 고빈도·고금액 고객의 관계 유지  
 
-- 근거: Recent high value 183명은 고객의 36.6%, 표본 구매 금액 합계의 80.2%다.  
+- 근거: Recent buyers / Frequent & high spending 183명은 고객의 36.6%, 표본 구매 금액 합계의 80.2%다.
 - 실행: 이 그룹에 구매 상품군과 연관된 추천을 소규모 대조 실험으로 제공한다. 목표는 재구매 유지이며 개선율은 아직 측정하지 않았다.  
 - 검증: 통제군과 비교한 재구매율·순이익, 반품·할인·동의 정보를 추가로 확인해야 한다. 높은 금액만으로 추천의 효과가 입증되지는 않는다.  
 
 ### 🟡 상대적으로 오래 미구매한 고가치 고객의 재방문 검증  
 
-- 근거: Less recent high value 57명의 평균 미구매 간격은 342.4일이고 표본 금액 비중은 11.1%다.  
+- 근거: No recent purchase / Frequent & high spending 57명의 평균 미구매 간격은 342.4일이고 표본 금액 비중은 11.1%다.
 - 실행: 이 그룹을 대상으로 재방문 안내와 미제공 대조군을 비교하는 실험을 설계한다. 목표는 재방문율 개선이며 실제 개선율은 아직 측정하지 않았다. 과거 구매일 기준 분류이며 현재 실제 이탈 고객이라고 단정하지 않는다.  
 - 검증: 관측 종료 뒤 구매 기록과 수신 동의, 재방문 이유가 필요하다. 관측 기간 종료 때문에 재방문을 못 본 것일 수도 있다.  
 
 ### 🟡 그 외 최근 구매 고객의 후속 구매 기회  
 
-- 근거: Recent other 68명의 평균 구매 빈도는 4.75행, 평균 금액 합계는 0.1205 원본 가격 단위다.  
+- 근거: Recent buyers / Less frequent or lower spending 68명의 평균 구매 빈도는 4.75행, 평균 금액 합계는 0.1205 원본 가격 단위다.
 - 실행: 이 그룹에 상품 사용 정보와 관련 상품 추천을 제공하는 실험을 설계하고 다음 구매일까지의 기간을 비교한다. 목표는 후속 구매까지의 기간 단축이며 실제 효과는 아직 측정하지 않았다. 신규 회원이라는 근거가 없으므로 신규 고객이라고 부르지 않는다.  
 - 검증: 가입일·반품·배송 만족도와 후속 구매 관측 기간이 필요하다. 단순한 계절 구매 고객이라면 추천 효과가 없을 수 있다.  
 

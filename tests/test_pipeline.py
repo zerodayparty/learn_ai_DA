@@ -87,7 +87,7 @@ class PipelineTests(unittest.TestCase):  # 분석 결과의 의미가 바뀌는 
         self.assertEqual(result.loc['fake_A', 'recency'], 1)  # 기준일보다 하루 전 구매한 고객이다.
         self.assertAlmostEqual(result.loc['fake_A', 'monetary'], 1.6)  # 0.4를 네 번 산 금액이다.
         self.assertEqual(set(result['segment']), set(SEGMENTS))  # 예상한 네 그룹이 모두 나타나야 한다.
-        self.assertEqual(result.loc['fake_C', 'segment'], 'Less recent high value')  # 과거 고빈도·고금액 고객을 구분한다.
+        self.assertEqual(result.loc['fake_C', 'segment'], 'No recent purchase / Frequent & high spending')  # 과거 고빈도·고금액 고객을 구분한다.
         daily = self.analyzer.calculate_rfm(reference_date='2020-09-22', frequency='purchase_days').set_index('customer_id')  # 구매일 수라는 다른 정의도 명시적으로 선택할 수 있다.
         self.assertEqual(daily.loc['fake_A', 'frequency'], 1)  # 주문 수와 구매 행 수를 혼동하지 않는다.
 

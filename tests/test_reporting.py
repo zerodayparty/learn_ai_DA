@@ -16,10 +16,10 @@ class ReportingTests(unittest.TestCase):  # 보고서를 읽을 수 없게 되�
         self.assertEqual(result.splitlines()[0], '| left | right |')  # 실제 열 두 개만 표 머리글에 있어야 한다.
 
     def test_named_segment_labels_are_preserved(self):  # 기존 그룹별 표도 그대로 읽을 수 있어야 한다.
-        frame = pd.DataFrame({'customers': [3]}, index=pd.Index(['Recent high value'], name='segment'))  # 이름 있는 그룹 인덱스를 만든다.
+        frame = pd.DataFrame({'customers': [3]}, index=pd.Index(['Recent buyers / Frequent & high spending'], name='segment'))  # 이름 있는 그룹 인덱스를 만든다.
         result = markdown_table(frame)  # 같은 변환기로 그룹 표를 만든다.
         self.assertIn('| segment | customers |', result)  # 그룹 이름표의 제목을 유지한다.
-        self.assertIn('| Recent high value | 3 |', result)  # 고객 수와 그룹 이름의 연결을 유지한다.
+        self.assertIn('| Recent buyers / Frequent & high spending | 3 |', result)  # 고객 수와 그룹 이름의 연결을 유지한다.
 
     def test_interpretations_use_actual_values_and_scope(self):  # 숫자·단위·해석의 연결을 정답 표로 검사한다.
         frame = pd.DataFrame({'price': [1.0, 3.0], 'product_name_length': [4.0, 8.0], 'description_length': [10.0, 30.0], 'image_mean': [0.25, 0.75], 'image_std': [0.1, 0.3]})  # 평균과 사분위수를 손으로 확인할 자료다.

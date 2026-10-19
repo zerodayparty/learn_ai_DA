@@ -68,16 +68,16 @@ def business_insights(analyzer):
 
     groups = analyzer.segment_summary()  # 고객별 개인정보가 없는 집계를 선택한다.
 
-    recent_value = groups.loc['Recent high value']  # 최근·고빈도·고금액 고객의 실제 수치를 읽는다.
+    recent_value = groups.loc['Recent buyers / Frequent & high spending']  # 최근·고빈도·고금액 고객의 실제 수치를 읽는다.
 
-    less_recent = groups.loc['Less recent high value']  # 상대적으로 오래 방문하지 않은 고가치 고객을 읽는다.
+    less_recent = groups.loc['No recent purchase / Frequent & high spending']  # 상대적으로 오래 방문하지 않은 고가치 고객을 읽는다.
 
-    recent_other = groups.loc['Recent other']  # 그 외 최근 구매 고객의 실제 수치를 읽는다.
+    recent_other = groups.loc['Recent buyers / Less frequent or lower spending']  # 그 외 최근 구매 고객의 실제 수치를 읽는다.
 
     return [  # 세 인사이트를 같은 근거·실행·검증 구조로 만든다.
-        {'title': '최근 고빈도·고금액 고객의 관계 유지', 'evidence': f"Recent high value {int(recent_value['customers'])}명은 고객의 {recent_value['customer_share']:.1%}, 표본 구매 금액 합계의 {recent_value['monetary_share']:.1%}다.", 'action': '이 그룹에 구매 상품군과 연관된 추천을 소규모 대조 실험으로 제공한다. 목표는 재구매 유지이며 개선율은 아직 측정하지 않았다.', 'validation': '통제군과 비교한 재구매율·순이익, 반품·할인·동의 정보를 추가로 확인해야 한다. 높은 금액만으로 추천의 효과가 입증되지는 않는다.'},  # 할인 효과나 이익을 가정하지 않는다.
-        {'title': '상대적으로 오래 미구매한 고가치 고객의 재방문 검증', 'evidence': f"Less recent high value {int(less_recent['customers'])}명의 평균 미구매 간격은 {less_recent['mean_recency']:.1f}일이고 표본 금액 비중은 {less_recent['monetary_share']:.1%}다.", 'action': '이 그룹을 대상으로 재방문 안내와 미제공 대조군을 비교하는 실험을 설계한다. 목표는 재방문율 개선이며 실제 개선율은 아직 측정하지 않았다. 과거 구매일 기준 분류이며 현재 실제 이탈 고객이라고 단정하지 않는다.', 'validation': '관측 종료 뒤 구매 기록과 수신 동의, 재방문 이유가 필요하다. 관측 기간 종료 때문에 재방문을 못 본 것일 수도 있다.'},  # 관측 종료와 실제 이탈을 구분한다.
-        {'title': '그 외 최근 구매 고객의 후속 구매 기회', 'evidence': f"Recent other {int(recent_other['customers'])}명의 평균 구매 빈도는 {recent_other['mean_frequency']:.2f}행, 평균 금액 합계는 {recent_other['mean_monetary']:.4f} 원본 가격 단위다.", 'action': '이 그룹에 상품 사용 정보와 관련 상품 추천을 제공하는 실험을 설계하고 다음 구매일까지의 기간을 비교한다. 목표는 후속 구매까지의 기간 단축이며 실제 효과는 아직 측정하지 않았다. 신규 회원이라는 근거가 없으므로 신규 고객이라고 부르지 않는다.', 'validation': '가입일·반품·배송 만족도와 후속 구매 관측 기간이 필요하다. 단순한 계절 구매 고객이라면 추천 효과가 없을 수 있다.'},  # 없는 가입일과 구매량을 만들지 않는다.
+        {'title': '최근 고빈도·고금액 고객의 관계 유지', 'evidence': f"Recent buyers / Frequent & high spending {int(recent_value['customers'])}명은 고객의 {recent_value['customer_share']:.1%}, 표본 구매 금액 합계의 {recent_value['monetary_share']:.1%}다.", 'action': '이 그룹에 구매 상품군과 연관된 추천을 소규모 대조 실험으로 제공한다. 목표는 재구매 유지이며 개선율은 아직 측정하지 않았다.', 'validation': '통제군과 비교한 재구매율·순이익, 반품·할인·동의 정보를 추가로 확인해야 한다. 높은 금액만으로 추천의 효과가 입증되지는 않는다.'},  # 할인 효과나 이익을 가정하지 않는다.
+        {'title': '상대적으로 오래 미구매한 고가치 고객의 재방문 검증', 'evidence': f"No recent purchase / Frequent & high spending {int(less_recent['customers'])}명의 평균 미구매 간격은 {less_recent['mean_recency']:.1f}일이고 표본 금액 비중은 {less_recent['monetary_share']:.1%}다.", 'action': '이 그룹을 대상으로 재방문 안내와 미제공 대조군을 비교하는 실험을 설계한다. 목표는 재방문율 개선이며 실제 개선율은 아직 측정하지 않았다. 과거 구매일 기준 분류이며 현재 실제 이탈 고객이라고 단정하지 않는다.', 'validation': '관측 종료 뒤 구매 기록과 수신 동의, 재방문 이유가 필요하다. 관측 기간 종료 때문에 재방문을 못 본 것일 수도 있다.'},  # 관측 종료와 실제 이탈을 구분한다.
+        {'title': '그 외 최근 구매 고객의 후속 구매 기회', 'evidence': f"Recent buyers / Less frequent or lower spending {int(recent_other['customers'])}명의 평균 구매 빈도는 {recent_other['mean_frequency']:.2f}행, 평균 금액 합계는 {recent_other['mean_monetary']:.4f} 원본 가격 단위다.", 'action': '이 그룹에 상품 사용 정보와 관련 상품 추천을 제공하는 실험을 설계하고 다음 구매일까지의 기간을 비교한다. 목표는 후속 구매까지의 기간 단축이며 실제 효과는 아직 측정하지 않았다. 신규 회원이라는 근거가 없으므로 신규 고객이라고 부르지 않는다.', 'validation': '가입일·반품·배송 만족도와 후속 구매 관측 기간이 필요하다. 단순한 계절 구매 고객이라면 추천 효과가 없을 수 있다.'},  # 없는 가입일과 구매량을 만들지 않는다.
     ]  # 실제 실행이나 고객 메시지 전송은 하지 않는다.
 
 

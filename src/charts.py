@@ -36,13 +36,17 @@ def build_charts(analyzer, output_dir=None):  # 실제 분석 결과로 필수 �
     # ✅ 02
     figures['02_price_boxplot'] = figure  # 두 번째 그래프를 등록한다.
     segments = analyzer.segment_summary()  # 고객별 행 대신 그룹별 집계를 사용한다.
-    figure, axis = frame('Customers by RFM segment', 'Customers', 'Segment', 'Recent means recency at or below the sample median. High value means frequency and monetary at or above their medians.')  # 그룹 분류의 실제 기준을 함께 설명한다.
-    labels = [fill(name, 18) for name in segments.index]  # 긴 고객 그룹 이름을 잘라 버리지 않고 줄바꿈한다.
+    rfm = analyzer.audit['rfm']  # 이번 실행에서 사용한 최근 구매·빈도·금액 기준을 읽는다.
+    frequency_unit = 'purchase rows' if rfm['frequency_unit'] == 'purchase_rows' else 'purchase days'  # 빈도 계산의 실제 단위를 표시한다.
+    note = f"Recent: last purchase within {rfm['recency_median_days']:g} days as of {rfm['reference_date']}. Frequent: at least {rfm['frequency_median']:g} {frequency_unit}; high spending: total original price at least {rfm['monetary_median']:.6f} source units. Less frequent or lower spending: below at least one of these purchase thresholds."  # 라벨을 읽는 데 필요한 기준을 공개한다.
+    figure, axis = frame('Customer groups by last purchase and buying activity', 'Number of customers', 'Customer group', note)  # 최근 여부와 구매 행동을 드러내는 제목·축을 사용한다.
+    figure.set_size_inches(11.5, 6.5)  # 두 줄 라벨과 기준 설명이 들어갈 공간을 확보한다.
+    labels = [name.replace(' / ', '\n') for name in segments.index]  # 최근 구매 여부와 구매 규모를 두 줄로 나눠 표시한다.
     bars = axis.barh(labels, segments['customers'], color=[COLORS[name] for name in segments.index])  # 네 그룹의 고객 수를 그린다.
     axis.bar_label(bars, padding=5, fmt='%.0f')  # 색상만으로 비교하지 않도록 정확한 수를 표시한다.
     axis.set_xlim(0, segments['customers'].max() * 1.22)  # 막대는 0에서 시작하고 숫자 표시 여유를 둔다.
     axis.invert_yaxis()  # 요약 표와 같은 순서로 보여 준다.
-    figure.subplots_adjust(left=0.24)  # 긴 그룹 이름을 위한 공간을 확보한다.
+    figure.subplots_adjust(left=0.36, bottom=0.25)  # 라벨을 줄이거나 자르지 않고 왼쪽과 아래 공간을 확보한다.
     
     # ✅ 03
     figures['03_segment_bar'] = figure  # 세 번째 그래프를 등록한다.
